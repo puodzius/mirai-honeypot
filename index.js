@@ -1,11 +1,6 @@
 var net = require('net');
 var http = require('http');
 var fs = require('fs');
-var aws = require("aws-sdk");
-
-aws.config.update({accessKeyId: "", secretAccessKey: ""});
-var s3 = new aws.S3(); 
-var S3_BUCKET = "atlantic-state-results";
 
 var hackAttempts = []
 
@@ -58,16 +53,7 @@ var server = net.createServer(function(socket){
       var collectedIPs = hackAttempts.map(function(d){ return d.ip });
       if( collectedIPs.indexOf(socket.remoteAddress) == -1 ){
         hackAttempts.push({ date: new Date(), username: username, password: password, ip: socket.remoteAddress });
-        // Push this file to S3
-        s3.putObject({
-        	Bucket: S3_BUCKET,
-        	Key: "hacker-logs.json",
-        	Body: JSON.stringify(hackAttempts) || "no data",
-        	ACL: "public-read"
-        }, function(err, data){
-        	if(err) console.log(err);
-          console.log("sent data")
-        });  
+        // TODO: code here if we want to keep a record of the collected IPs
         
       }
       socket.end();
